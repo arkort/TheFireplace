@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerControllerScript : MonoBehaviour {
+public class PlayerControllerScript : MonoBehaviour
+{
 
     Rigidbody rigid;
 
@@ -15,33 +16,35 @@ public class PlayerControllerScript : MonoBehaviour {
     Quaternion originalRotation;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         rigid = GetComponent<Rigidbody>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        rigid.velocity = Input.GetAxis("Vertical") * speedModifier * transform.forward;
-
-        rigid.rotation = Quaternion.Euler(rigid.rotation.eulerAngles + new Vector3(0f, cameraSensitivity * Input.GetAxis("Mouse X"), 0f));
-        playerCamera.transform.rotation = playerCamera.transform.rotation * Quaternion.Euler(-cameraSensitivity * Input.GetAxis("Mouse Y"), 0f , 0f);
-
-        if(playerCamera.transform.localRotation.eulerAngles.x > 60)
-        {
-            playerCamera.transform.localRotation = Quaternion.Euler(60, playerCamera.transform.localRotation.y, playerCamera.transform.localRotation.z);
-        }
-        if (playerCamera.transform.localRotation.eulerAngles.x < -60)
-        {
-            playerCamera.transform.localRotation = Quaternion.Euler(-60, playerCamera.transform.localRotation.y, playerCamera.transform.localRotation.z);
-        }
     }
 
-    private float ClampAngle(float angle, float min, float max)
+    // Update is called once per frame
+    void Update()
     {
-        if (angle < -360F)
-         angle += 360F;
-        if (angle > 360F)
-         angle -= 360F;
-        return Mathf.Clamp(angle, min, max);
+    }
+
+    void FixedUpdate()
+    {
+        ProcessMovement();
+        ProcessRotation();
+    }
+
+    private void ProcessMovement()
+    {
+        rigid.MovePosition(transform.position + (Input.GetAxis("Vertical") * transform.forward + Input.GetAxis("Horizontal") * transform.right).normalized * speedModifier*Time.deltaTime);
+    }
+
+    private void ProcessRotation()
+    {
+        rigid.rotation = Quaternion.Euler(rigid.rotation.eulerAngles + new Vector3(0f, cameraSensitivity * Input.GetAxis("Mouse X"), 0f));
+
+        rotationY += Input.GetAxis("Mouse Y") * cameraSensitivity;
+        rotationY = Mathf.Clamp(rotationY, -60, 60);
+
+        playerCamera.transform.localEulerAngles = new Vector3(-rotationY, 0, 0);
+
     }
 }
