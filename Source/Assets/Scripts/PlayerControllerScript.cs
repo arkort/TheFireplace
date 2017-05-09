@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class PlayerControllerScript : MonoBehaviour
 {
+    const int WALK_MODIFIER = 4;
+    const int RUN_MODIFIER = 7;
+    const int JUMP_MODIFIER = 300;
+
 
     Rigidbody rigid;
 
-    public int speedModifier;
     public int cameraSensitivity;
     public Camera playerCamera;
 
@@ -37,11 +40,13 @@ public class PlayerControllerScript : MonoBehaviour
 
     private void ProcessMovement()
     {
+        int speedModifier = Input.GetKey("left shift") ? RUN_MODIFIER : WALK_MODIFIER;
+
         rigid.MovePosition(transform.position + (Input.GetAxis("Vertical") * transform.forward + Input.GetAxis("Horizontal") * transform.right).normalized * speedModifier * Time.deltaTime);
 
         if (Input.GetButtonDown("Jump") && IsGrounded())
         {
-            rigid.AddForce(transform.up * 300, ForceMode.Impulse);
+            rigid.AddForce(transform.up * JUMP_MODIFIER, ForceMode.Impulse);
         }
     }
 
